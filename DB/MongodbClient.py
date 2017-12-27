@@ -23,10 +23,10 @@ class MongodbClient(object):
             password=pwd,
             host=host,
             port=port,
-            db_name='proxy')
+            db_name='ipproxy')
         self.name = name
         self.client = MongoClient(uri)
-        self.db = self.client.proxy
+        self.db = self.client.ipproxy
 
     def changeTable(self, name):
         self.name = name
