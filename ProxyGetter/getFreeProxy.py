@@ -65,7 +65,7 @@ class GetFreeProxy(object):
         :return:
         """
         url = "http://www.66ip.cn/mo.php?sxb=&tqsl={}&port=&export=&ktip=&sxa=&submit=%CC%E1++%C8%A1&textarea=".format(
-                proxy_number)
+            proxy_number)
         request = WebRequest()
         # html = request.get(url).content
         # content为未解码，text为解码后的字符串
@@ -149,6 +149,76 @@ class GetFreeProxy(object):
         except Exception as e:
             pass
 
+    @staticmethod
+    def freeProxyXiciHttps():
+        """
+        抓取西刺代理 http://api.xicidaili.com/free2016.txt
+        :return:
+        """
+        url_list = ['http://www.xicidaili.com/wn/{}'.format(i) for i in range(1, 801)]
+        for each_url in url_list:
+            tree = getHtmlTree(each_url)
+            proxy_list = tree.xpath('.//table[@id="ip_list"]//tr')
+            for proxy in proxy_list:
+                cell_list = proxy.xpath('./td/text()')
+                try:
+                    if len(cell_list) > 6 and cell_list[4] == u'高匿' and cell_list[5] == u'HTTPS':
+                        yield ':'.join(cell_list[0:2])
+                except Exception as e:
+                    pass
+
+
+# 此处修改伪造的头字段,
+headers = {
+    'Host': "www.xicidaili.com",  # 需要修改为当前网站主域名
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept-Language": "en-US,en;q=0.5",
+    "Connection": "keep-alive",
+    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0",
+    # "referer" : '123.123.123.123'#随意的伪造值
+}
+
+
+# 发起请求,
+@staticmethod
+def get_request(url, headers):
+    '''参数引入及头信息'''
+    html = requests.get(url, headers=headers, timeout=20).text
+    return html
+
+
+# 将页面源代码正则匹配并解析,返回列表,其中每一项是json的数据
+@staticmethod
+def re_html_code(html_code, proxy_list_json):
+    # re正则取出数据
+    try:
+        re_list_ip = re.findall(r'<td>\d*\.\d*\.\d*\.\d*</td>', html_code)
+        re_list_port = re.findall(r'<td>[\d]*</td>', html_code)
+        re_list_live_time = re.findall(u'<td>\d*[小时分钟天]+</td>', html_code)
+        re_list_time = re.findall(r'<td>\d*-\d*-\d* \d*:\d*</td>', html_code)
+        l = len(re_list_ip)
+        for i in range(l):
+            PROXY_IP = re_list_ip[i].replace('<td>', '').replace('</td>', "")
+            PROXY_PORT = re_list_port[i].replace('<td>', '').replace('</td>', "")
+            PROXY_COUNTRY = 'China'
+            PROXY_TYPE = 'Elite'
+            addtime = re_list_time[i].replace('<td>', '').replace('</td>', "")
+            Last_test_time = re_list_live_time[i].replace('<td>', '').replace('</td>', "")
+            proxy_status = '1'
+            Remarks = 'ly'
+            # `id`, `proxy_ip`, `proxy_port`, `proxy_country`, `proxy_type`, `addtime`, `Last_test_time`, `proxy_status`, `Remarks`
+            list_i = [PROXY_IP, PROXY_PORT, PROXY_COUNTRY, PROXY_TYPE, addtime, Last_test_time, proxy_status,
+                      Remarks]
+
+            proxy_list_json.append(list_i)
+
+        print(proxy_list_json)
+        return proxy_list_json
+
+    except Exception as e:
+        print(e)
+
 
 if __name__ == '__main__':
     gg = GetFreeProxy()
@@ -159,7 +229,7 @@ if __name__ == '__main__':
     #     print(e)
     #
     # for e in gg.freeProxyThird():
-        # print(e)
+    # print(e)
 
     # for e in gg.freeProxyFourth():
     #     print(e)
