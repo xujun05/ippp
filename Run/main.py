@@ -14,8 +14,10 @@ __author__ = 'JHao'
 
 import sys
 from multiprocessing import Process
+import time
 
-
+print("Waiting for MongoDB...")
+time.sleep(10)
 sys.path.append('../')
 
 from Api.ProxyApi import run as ProxyApiRun
