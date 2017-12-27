@@ -16,8 +16,6 @@ import sys
 from multiprocessing import Process
 import time
 
-print("Waiting for MongoDB...")
-time.sleep(10)
 sys.path.append('../')
 
 from Api.ProxyApi import run as ProxyApiRun
@@ -40,5 +38,8 @@ def run():
     for p in p_list:
         p.join()
 
+
 if __name__ == '__main__':
-   run()
+    print("Waiting for MongoDB...")
+    time.sleep(10)
+    run()
