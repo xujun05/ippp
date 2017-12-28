@@ -13,6 +13,7 @@
 """
 import re
 import requests
+import time
 
 try:
     from importlib import reload  # py3 实际不会实用，只是为了不显示语法错误
@@ -155,8 +156,9 @@ class GetFreeProxy(object):
         抓取西刺代理 http://api.xicidaili.com/free2016.txt
         :return:
         """
-        url_list = ['http://www.xicidaili.com/wn/{}'.format(i) for i in range(1, 801)]
+        url_list = ['http://www.xicidaili.com/wn/{}'.format(i) for i in range(1, 50)]
         for each_url in url_list:
+            time.sleep(1)
             tree = getHtmlTree(each_url)
             proxy_list = tree.xpath('.//table[@id="ip_list"]//tr')
             for proxy in proxy_list:
@@ -166,7 +168,6 @@ class GetFreeProxy(object):
                         yield ':'.join(cell_list[0:2])
                 except Exception as e:
                     pass
-
 
 
 if __name__ == '__main__':
